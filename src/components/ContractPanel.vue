@@ -1,21 +1,17 @@
 <template>
 <div>
   <v-card class="mx-auto my-12" width="70%">
-    <v-card-title>TokenA</v-card-title>
+    <v-card-title>TokenA ({{contracts.tokenA.address}})</v-card-title>
     <v-form>
     <v-container>
       <v-row>
-      <v-col cols="12" md="4">
-        balanceOf
-      </v-col>
+      <v-col cols="12" md="4"> balanceOf </v-col>
       <v-col cols="12" md="8">
         <v-text-field label="address" v-model="contracts.tokenA.balanceOf.address" required></v-text-field>
       </v-col>
       </v-row>
       <v-row>
-      <v-col cols="12" md="4">
-        <v-btn @click="invokeTokenalanceOf(contracts.tokenA)">Execute</v-btn>
-      </v-col>
+      <v-col cols="12" md="4"><v-btn @click="invokeTokenalanceOf(contracts.tokenA)">Execute</v-btn></v-col>
       <v-col cols="12" md="8">
         <v-chip v-if="contracts.tokenA.balanceOf.result!=''">{{contracts.tokenA.balanceOf.result}}</v-chip>
       </v-col>
@@ -73,7 +69,7 @@
   </v-card>
 
   <v-card class="mx-auto my-12" width="70%">
-    <v-card-title>TokenB</v-card-title>
+    <v-card-title>TokenB ({{contracts.tokenB.address}})</v-card-title>
     <v-form>
     <v-container>
       <v-row>
@@ -118,7 +114,7 @@
   </v-card>
 
   <v-card class="mx-auto my-12" width="70%">
-    <v-card-title>DSPToken</v-card-title>
+    <v-card-title>DSPToken ({{contracts.tokenDSP.address}})</v-card-title>
     <v-form>
     <v-container>
       <v-row>
@@ -139,7 +135,7 @@
   </v-card>
 
   <v-card class="mx-auto my-12" width="70%">
-    <v-card-title>Router</v-card-title>
+    <v-card-title>Router ({{contracts.router.address}})</v-card-title>
     <v-form>
     <v-container>
       <v-row>
@@ -170,7 +166,7 @@
   </v-card>
 
   <v-card class="mx-auto my-12" width="70%">
-    <v-card-title>PairAB</v-card-title>
+    <v-card-title>PairAB ({{contracts.pairAB.address}})</v-card-title>
     <v-form>
     <v-container>
       <v-row>
@@ -228,7 +224,7 @@
   </v-card>
 
   <v-card class="mx-auto my-12" width="70%">
-    <v-card-title>Invitation</v-card-title>
+    <v-card-title>Invitation ({{contracts.invitation.address}})</v-card-title>
     <v-form>
     <v-container>
       <v-row>
@@ -296,6 +292,7 @@ export default {
         provider: null,
         contracts: {
             tokenA: {
+                address: this.$store.state.contracts.tokenA.address,
                 contract: null,
                 balanceOf: {
                     address: '',
@@ -313,6 +310,7 @@ export default {
                 }
             },
             tokenB: {
+                address: this.$store.state.contracts.tokenB.address,
                 contract: null,
                 balanceOf: {
                     address: '',
@@ -330,6 +328,7 @@ export default {
                 }
             },
             tokenDSP: {
+                address: this.$store.state.contracts.tokenDsp.address,
                 contract: null,
                 balanceOf: {
                     address: '',
@@ -337,6 +336,7 @@ export default {
                 }
             },
             router: {
+                address: this.$store.state.contracts.router.address,
                 contract: null,
                 addLiquidity: {
                     tokenA: '',
@@ -345,6 +345,7 @@ export default {
                 }
             },
             invitation: {
+                address: this.$store.state.contracts.invitation.address,
                 contract: null,
                 addInvitationRelation: {
                     inviter: '',
@@ -360,6 +361,7 @@ export default {
                 }
             },
             pairAB: {
+                address: this.$store.state.contracts.pairAB.address,
                 contract: null,
                 balanceOf: {
                     address: '',
