@@ -7,6 +7,7 @@ import * as mutations from './mutations'
 Vue.use(Vuex)
 
 const state = {
+  accounts: [],
   contracts: {
       tokenA: {
         address: '0x22d9a135818e0bF814D3b05B2064C7921AA4fb6f',
@@ -16,18 +17,20 @@ const state = {
           "function symbol() view returns (string)",
           "function transfer(address to, uint amount) returns (boolean)",
           "function approve(address to, uint amount) returns (boolean)",
+          "function allowance(address approver, address to) view returns (uint256)",
           "event Transfer(address indexed from, address indexed to, uint amount)"
         ]
       },
       tokenB: {
         address: '0xB1C40D243BE13D9912c641D890E72C856232fB18',
         abi: [
-            "function balanceOf(address owner) view returns (uint256)",
-            "function decimals() view returns (uint8)",
-            "function symbol() view returns (string)",
-            "function transfer(address to, uint amount) returns (boolean)",
-            "function approve(address to, uint amount) returns (boolean)",
-            "event Transfer(address indexed from, address indexed to, uint amount)"
+          "function balanceOf(address owner) view returns (uint256)",
+          "function decimals() view returns (uint8)",
+          "function symbol() view returns (string)",
+          "function transfer(address to, uint amount) returns (boolean)",
+          "function approve(address to, uint amount) returns (boolean)",
+          "function allowance(address approver, address to) view returns (uint256)",
+          "event Transfer(address indexed from, address indexed to, uint amount)"
         ]
       },
       weth: {
@@ -40,19 +43,54 @@ const state = {
         ]
       },
       pairAB: {
-        address: '0xb84CCb6Da7f3735edC03c81e05FA17e41364FBEd'
+        address: '0xb84CCb6Da7f3735edC03c81e05FA17e41364FBEd',
+        abi: [
+          "function balanceOf(address owner) view returns (uint256)",
+          "function decimals() view returns (uint8)",
+          "function symbol() view returns (string)",
+          "function transfer(address to, uint amount) returns (boolean)",
+          "function approve(address to, uint amount) returns (boolean)",
+          "function allowance(address approver, address to) view returns (uint256)",
+          "function token0() view returns (address)",
+          "function token1() view returns (address)",
+          "event Transfer(address indexed from, address indexed to, uint amount)"
+        ]
       },
       pairEthB: {
-        address: '0xa39F36e73bf89A21897257B66A44B2426dA71952'
+        address: '0xa39F36e73bf89A21897257B66A44B2426dA71952',
+        abi: [
+          "function balanceOf(address owner) view returns (uint256)",
+          "function decimals() view returns (uint8)",
+          "function symbol() view returns (string)",
+          "function transfer(address to, uint amount) returns (boolean)",
+          "function approve(address to, uint amount) returns (boolean)",
+          "function allowance(address approver, address to) view returns (uint256)",
+          "function token0() view returns (address)",
+          "function token1() view returns (address)",
+          "event Transfer(address indexed from, address indexed to, uint amount)"
+        ]
       },
       dao: {
         address: '0xc03c50A538C4336E2d7198824408459B0C7252ee'
       },
       tokenDsp: {
-        address: '0xE0eb0Ee7b3849DEe344E1A9661A3bAA74220d8Ba'
+        address: '0xE0eb0Ee7b3849DEe344E1A9661A3bAA74220d8Ba',
+        abi: [
+          "function balanceOf(address owner) view returns (uint256)",
+          "function decimals() view returns (uint8)",
+          "function symbol() view returns (string)",
+          "function transfer(address to, uint amount) returns (boolean)",
+          "function approve(address to, uint amount) returns (boolean)",
+          "function allowance(address approver, address to) view returns (uint256)",
+          "event Transfer(address indexed from, address indexed to, uint amount)"
+        ]
       },
       invitation: {
-        address: '0xC732Ca61ac112a6Bcb78D972E91c4b113356B953'
+        address: '0xC732Ca61ac112a6Bcb78D972E91c4b113356B953',
+        abi: [
+            "function add_invitation_relation(address inviter)",
+            "function getDelegate(address self) view returns (address)",
+        ]
       }
   },
   history: []

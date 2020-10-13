@@ -1,10 +1,10 @@
-export const increment = state => {
-  state.count++
-  state.history.push('increment')
+export const updateAccount = (state, payload) => {
+  state.accounts = payload
+  state.history.push('updateAccount')
 }
   
-export const decrement = state => {
-  state.count--
-  state.history.push('decrement')
-}
+// export const updateTokenBContract = (state, payload) => {
+//     state.contracts.tokenB.contract = payload
+//     state.history.push('updateTokenAContract')
+//   }
   

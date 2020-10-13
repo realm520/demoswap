@@ -6,9 +6,12 @@
         <v-toolbar-title>DemoSwap</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-chip v-if="isConnected">{{this.currentBalance}} ETH</v-chip>
-        <v-chip v-if="isConnected">{{this.currentAccount}}</v-chip>
-        <v-btn @click="connectWallet" v-if="!isConnected">
-          Connect to a wallet
+        <v-chip v-if="isConnected">{{this.accounts[0]}}</v-chip>
+        <v-btn @click="connectWallet" v-if="!isMetaMaskInstalled">
+          Install Metamask
+        </v-btn>
+        <v-btn @click="connectWallet" v-if="isMetaMaskInstalled&&!isConnected">
+          Connect MetaMask
         </v-btn>
         <v-btn icon>
           <v-icon large color="orange">mdi-cogs</v-icon>
@@ -38,25 +41,56 @@ export default {
     isConnected: false,
     currentAccount: '',
     currentBalance: 0,
-    provider: null
+    provider: null,
+    accounts: []
   }),
+  mounted() {
+    if (this.isMetaMaskInstalled()){
+      const { ethereum } = window
+      ethereum.on('accountsChanged', this.handleNewAccounts)
+      this.checkMetaMask()
+    }
+  },
   methods: {
+    isMetaMaskInstalled() {
+      const { ethereum } = window
+      return Boolean(ethereum && ethereum.isMetaMask);
+    },
+    isMetaMaskConnected() {
+      return this.accounts && this.accounts.length > 0
+    },
+    async checkMetaMask() {
+      const { ethereum } = window
+      try {
+        const newAccounts = await ethereum.request({
+          method: 'eth_accounts',
+        })
+        this.handleNewAccounts(newAccounts)
+      } catch (err) {
+        console.error('Error on init when getting accounts', err)
+      }
+    },
     async connectWallet() {
       console.log("connectting to wallet")
-      this.provider = new ethers.providers.Web3Provider(window.ethereum)
-      const accounts = await this.provider.provider.request({method: 'eth_requestAccounts'})
-      this.currentAccount = accounts[0]
-      console.log(this.currentAccount)
-      let balance = await this.provider.getBalance(this.currentAccount)
-      this.currentBalance = balance.div(BigNumber.from('100000000000')).toNumber() / 1000000
-      this.isConnected = true
-      console.log(balance)
-      // provider.request({method: 'eth_requestAccounts'})
-      // const tx = signer.sendTransaction({
-      //   to: "ricmoo.firefly.eth",
-      //   value: ethers.utils.parseEther("1.0")
-      // });
-      // console.log(tx)
+      const { ethereum } = window
+      try {
+        const newAccounts = await ethereum.request({
+          method: 'eth_requestAccounts',
+        })
+        this.handleNewAccounts(newAccounts)
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    async handleNewAccounts(newAccounts) {
+      this.accounts = newAccounts
+      if (this.isMetaMaskConnected()) {
+        this.$store.commit('updateAccount', this.accounts)
+        this.provider = new ethers.providers.Web3Provider(window.ethereum)
+        let balance = await this.provider.getBalance(this.accounts[0])
+        this.currentBalance = balance.div(BigNumber.from('100000000000')).toNumber() / 1000000
+        this.isConnected = true
+      }
     }
   }
 };
