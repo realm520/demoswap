@@ -50,27 +50,27 @@ export default {
   },
   methods: {
     mounted: async function() {
-      const tokenA = new ethers.Contract(
+      this.tokenA = new ethers.Contract(
           this.$store.contracts.tokenA.address,
           this.$store.contracts.tokenA.abi,
           this.provider.getSigner())
-      const tokenB = new ethers.Contract(
+      this.tokenB = new ethers.Contract(
           this.$store.contracts.tokenB.address,
           this.$store.contracts.tokenB.abi,
           this.provider.getSigner())
-      const router = new ethers.Contract(
+      this.router = new ethers.Contract(
           this.$store.contracts.router.address,
           this.$store.contracts.router.abi,
           this.provider.getSigner())
     },
     async addLiquidity() {
-      const balanceTokenA = await tokenA.balanceOf(this.currentAccount)
+      const balanceTokenA = await this.tokenA.balanceOf(this.currentAccount)
       console.log(balanceTokenA)
-      const ret1 = await tokenA.approve(this.$store.contracts.router.address, 1000000)
+      const ret1 = await this.tokenA.approve(this.$store.contracts.router.address, 1000000)
       console.log(ret1)
-      const ret2 = await tokenB.approve(this.$store.contracts.router.address, 1000000)
+      const ret2 = await this.tokenB.approve(this.$store.contracts.router.address, 1000000)
       console.log(ret2)
-      const ret3 = await router.addLiquidity(this.$store.contracts.tokenA.address, this.$store.contracts.tokenB.address, 100000, 100000, 0, 0, 1702480290)
+      const ret3 = await this.router.addLiquidity(this.$store.contracts.tokenA.address, this.$store.contracts.tokenB.address, 100000, 100000, 0, 0, 1702480290)
       console.log(ret3)
     }
   },
