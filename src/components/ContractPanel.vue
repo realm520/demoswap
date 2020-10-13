@@ -38,7 +38,7 @@
       </v-row>
       <v-row>
       <v-col cols="12" md="4">
-        <v-btn @click="invokeTokenAApprove">Execute</v-btn>
+        <v-btn @click="invokeTokenApprove(contracts.tokenA)">Execute</v-btn>
       </v-col>
       <v-col cols="12" md="8">
         <v-chip v-if="contracts.tokenA.approve.result!=''">{{contracts.tokenA.approve.result}}</v-chip>
@@ -62,7 +62,7 @@
       </v-row>
       <v-row>
       <v-col cols="12" md="4">
-        <v-btn @click="invokeTokenAAllowance">Execute</v-btn>
+        <v-btn @click="invokeTokenAllowance(contracts.tokenA)">Execute</v-btn>
       </v-col>
       <v-col cols="12" md="8">
         <v-chip v-if="contracts.tokenA.allowance.result!=''">{{contracts.tokenA.allowance.result}}</v-chip>
@@ -72,7 +72,7 @@
     </v-form>
   </v-card>
 
-  <!-- <v-card class="mx-auto my-12" width="500">
+  <v-card class="mx-auto my-12" width="70%">
     <v-card-title>TokenB</v-card-title>
     <v-form>
     <v-container>
@@ -94,27 +94,30 @@
       <v-col cols="12" md="4">
         allowance
       </v-col>
-      <v-col cols="12" md="4">
-        <v-text-field label="approver" v-model="contracts.tokenA.allowance.approver" required></v-text-field>
+      <v-col cols="12" md="8">
+        <v-text-field label="approver" v-model="contracts.tokenB.allowance.approver" required></v-text-field>
       </v-col>
       </v-row>
       <v-row>
       <v-col cols="12" md="4">
       </v-col>
-      <v-col cols="12" md="4">
-        <v-text-field label="address" v-model="contracts.tokenA.allowance.address" required></v-text-field>
+      <v-col cols="12" md="8">
+        <v-text-field label="approveTo" v-model="contracts.tokenB.allowance.approveTo" required></v-text-field>
       </v-col>
       </v-row>
       <v-row>
       <v-col cols="12" md="4">
-        <v-btn @click="invokeTokenBAllowance">Execute</v-btn>
+        <v-btn @click="invokeTokenAllowance(contracts.tokenB)">Execute</v-btn>
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-chip v-if="contracts.tokenB.allowance.result!=''">{{contracts.tokenB.allowance.result}}</v-chip>
       </v-col>
       </v-row>
     </v-container>
     </v-form>
-  </v-card> -->
+  </v-card>
 
-  <!-- <v-card class="mx-auto my-12" width="500">
+  <v-card class="mx-auto my-12" width="70%">
     <v-card-title>DSPToken</v-card-title>
     <v-form>
     <v-container>
@@ -128,19 +131,14 @@
       </v-row>
       <v-row>
       <v-col cols="12" md="4">
-        <v-btn @click="invokeTokenalanceOf(constracts.tokenDSP)">Execute</v-btn>
-      </v-col>
-      <v-col cols="12" md="8">
-        <v-chip v-if="contracts.tokenDSP.balanceOf.result!=''">{{contracts.tokenDSP.balanceOf.result}}</v-chip>
+        <v-btn @click="invokeTokenalanceOf(contracts.tokenDSP)">Execute</v-btn>
       </v-col>
       </v-row>
-
-
     </v-container>
     </v-form>
-  </v-card> -->
+  </v-card>
 
-  <v-card class="mx-auto my-12" width="500">
+  <v-card class="mx-auto my-12" width="70%">
     <v-card-title>Router</v-card-title>
     <v-form>
     <v-container>
@@ -263,6 +261,24 @@
           <v-chip v-if="contracts.invitation.getDelegate.result!=''">{{contracts.invitation.getDelegate.result}}</v-chip>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col cols="12" md="4"> getMembers </v-col>
+        <v-col cols="12" md="8">
+        <v-text-field label="Address" v-model="contracts.invitation.getMembers.address" required></v-text-field>
+      </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12" md="4">
+          <v-btn @click="getMembers">Execute</v-btn>
+        </v-col>
+        <v-col cols="12" md="8">
+          <v-list flatv-if="contracts.invitation.getMembers.result.length>0">
+            <v-list-item v-for="(item, i) in contracts.invitation.getMembers.result" :key="i">
+              <v-chip>{{item}}</v-chip>
+            </v-list-item>
+          </v-list>
+        </v-col>
+      </v-row>
     </v-container>
     </v-form>
   </v-card>
@@ -337,6 +353,10 @@ export default {
                 getDelegate: {
                     address: '',
                     result: ''
+                },
+                getMembers: {
+                    address: '',
+                    result: []
                 }
             },
             pairAB: {
@@ -390,33 +410,25 @@ export default {
             this.provider.getSigner())
       }
     },
-    async invokeTokenalanceOf(contract) {
+    async invokeTokenalanceOf(token) {
       this.checkMetaMask()
-      const balanceTokenA = await contract.contract.balanceOf(contract.balanceOf.address)
+      const balance = await token.contract.balanceOf(token.balanceOf.address)
     //   this.contracts.tokenA.balanceOf.result = balanceTokenA.div(BigNumber.from('100000000000')).toNumber() / 1000000
-      contract.balanceOf.result = balanceTokenA.div(BigNumber.from('100000000000')).toString()
+      token.balanceOf.result = balance.div(BigNumber.from('100000000000')).toString()
     },
-    async invokeTokenAAllowance() {
+    async invokeTokenAllowance(token) {
       this.checkMetaMask()
-      const allowanceTokenA = await this.contracts.tokenA.contract.allowance(
-        this.contracts.tokenA.allowance.approver, 
-        this.contracts.tokenA.allowance.approveTo)
-      console.log(allowanceTokenA)
-      this.contracts.tokenA.allowance.result = allowanceTokenA
+      const allowance = await token.contract.allowance(
+        token.allowance.approver, 
+        token.allowance.approveTo)
+      token.allowance.result = allowance
     },
-    async invokeTokenAApprove() {
+    async invokeTokenApprove(token) {
       this.checkMetaMask()
-      const approveTokenA = await this.contracts.tokenA.contract.approve(
-        this.contracts.tokenA.approve.approveTo, 
-        this.contracts.tokenA.approve.value)
-    //   console.log(approveTokenA)
-      this.contracts.tokenA.approve.result = approveTokenA.hash
-    },
-    async invokeTokenBAllowance() {
-      const allowanceTokenB = await this.contracts.tokenB.contract.allowance(
-        this.contracts.tokenB.allowance.approver, 
-        this.contracts.tokenB.allowance.address)
-      console.log(allowanceTokenB)
+      const tx = await token.contract.approve(
+        token.approve.approveTo, 
+        token.approve.value)
+      token.approve.result = tx.hash
     },
     async invokeRouterAddLiquidity() {
       this.checkMetaMask()
@@ -447,10 +459,24 @@ export default {
       }
     },
     async getDelegate() {
+      this.checkMetaMask()
+      if (this.contracts.invitation.getDelegate.address == '') {
+          return
+      }
       const delegate = await this.contracts.invitation.contract.getDelegate(
           this.contracts.invitation.getDelegate.address
       )
       this.contracts.invitation.getDelegate.result = delegate
+    },
+    async getMembers() {
+      this.checkMetaMask()
+      if (this.contracts.invitation.getMembers.address == '') {
+          return
+      }
+      const members = await this.contracts.invitation.contract.getMembers(
+          this.contracts.invitation.getMembers.address
+      )
+      this.contracts.invitation.getMembers.result = members
     }
   },
 }

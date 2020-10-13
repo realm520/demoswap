@@ -90,6 +90,7 @@ const state = {
         abi: [
             "function add_invitation_relation(address inviter)",
             "function getDelegate(address self) view returns (address)",
+            "function getMembers(address addr) view returns (address[])"
         ]
       }
   },
