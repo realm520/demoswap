@@ -71,10 +71,14 @@ const state = {
         ]
       },
       dao: {
-        address: '0xc03c50A538C4336E2d7198824408459B0C7252ee'
+        address: '0xA2849A3B487e4de9D03226ab84060209c329A875',
+        abi: [
+          "function getReward(address swap_addr)",
+          "function predReward(address swap_addr) view returns (uint256)"
+        ]
       },
       tokenDsp: {
-        address: '0xE0eb0Ee7b3849DEe344E1A9661A3bAA74220d8Ba',
+        address: '0x36b484f9cC0698C2fEB4aa25Db0056E4FFe630Fc',
         abi: [
           "function balanceOf(address owner) view returns (uint256)",
           "function decimals() view returns (uint8)",

@@ -64,6 +64,30 @@
         <v-chip v-if="contracts.tokenA.allowance.result!=''">{{contracts.tokenA.allowance.result}}</v-chip>
       </v-col>
       </v-row>
+
+      <v-row>
+      <v-col cols="12" md="4">
+        transfer
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-text-field label="to" v-model="contracts.tokenA.transfer.to" required></v-text-field>
+      </v-col>
+      </v-row>
+      <v-row>
+      <v-col cols="12" md="4">
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-text-field label="value" v-model="contracts.tokenA.transfer.value" required></v-text-field>
+      </v-col>
+      </v-row>
+      <v-row>
+      <v-col cols="12" md="4">
+        <v-btn @click="invokeTokenTransfer(contracts.tokenA)">Execute</v-btn>
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-chip v-if="contracts.tokenA.transfer.result!=''">{{contracts.tokenA.transfer.result}}</v-chip>
+      </v-col>
+      </v-row>
     </v-container>
     </v-form>
   </v-card>
@@ -159,6 +183,46 @@
       </v-col>
       <v-col cols="12" md="8">
         <v-chip v-if="contracts.router.addLiquidity.result!=''">{{contracts.router.addLiquidity.result}}</v-chip>
+      </v-col>
+      </v-row>
+    </v-container>
+    </v-form>
+  </v-card>
+
+  <v-card class="mx-auto my-12" width="70%">
+    <v-card-title>Dao ({{contracts.dao.address}})</v-card-title>
+    <v-form>
+    <v-container>
+      <v-row>
+      <v-col cols="12" md="4">
+        getReward
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-text-field label="" v-model="contracts.dao.getReward.address" required></v-text-field>
+      </v-col>
+      </v-row>
+      <v-row>
+      <v-col cols="12" md="4">
+        <v-btn @click="getReward">Execute</v-btn>
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-chip v-if="contracts.dao.getReward.result!=''">{{contracts.dao.getReward.result}}</v-chip>
+      </v-col>
+      </v-row>
+      <v-row>
+      <v-col cols="12" md="4">
+        predReward
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-text-field label="" v-model="contracts.dao.predReward.address" required></v-text-field>
+      </v-col>
+      </v-row>
+      <v-row>
+      <v-col cols="12" md="4">
+        <v-btn @click="predReward">Execute</v-btn>
+      </v-col>
+      <v-col cols="12" md="8">
+        <v-chip v-if="contracts.dao.predReward.result!=''">{{contracts.dao.predReward.result}}</v-chip>
       </v-col>
       </v-row>
     </v-container>
@@ -283,11 +347,13 @@
 <script>
 
 import { BigNumber, ethers } from "ethers";
+// import { exception } from 'console';
 
 export default {
   name: 'PoolPanel',
   data() {
       return {
+        fromAddr: '0x5Da9aF329740c4c155e05932749fCBa44Cf09c79',
         isShowPoolBtn: true,
         provider: null,
         contracts: {
@@ -295,17 +361,22 @@ export default {
                 address: this.$store.state.contracts.tokenA.address,
                 contract: null,
                 balanceOf: {
-                    address: '',
+                    address: '0x5Da9aF329740c4c155e05932749fCBa44Cf09c79',
                     result: ''
                 },
                 approve: {
-                    approveTo: '',
+                    approveTo: '0xd89a3CD50f257B8c035AC622d41452fdA0DBD645',
                     value: '',
                     result: ''
                 },
                 allowance: {
-                    approver: '',
-                    approveTo: '',
+                    approver: '0x5Da9aF329740c4c155e05932749fCBa44Cf09c79',
+                    approveTo: '0xd89a3CD50f257B8c035AC622d41452fdA0DBD645',
+                    result: ''
+                },
+                transfer: {
+                    to: '0xd89a3CD50f257B8c035AC622d41452fdA0DBD645',
+                    value: '',
                     result: ''
                 }
             },
@@ -313,11 +384,11 @@ export default {
                 address: this.$store.state.contracts.tokenB.address,
                 contract: null,
                 balanceOf: {
-                    address: '',
+                    address: '0x5Da9aF329740c4c155e05932749fCBa44Cf09c79',
                     result: ''
                 },
                 approve: {
-                    approveTo: '',
+                    approveTo: '0xd89a3CD50f257B8c035AC622d41452fdA0DBD645',
                     value: '',
                     result: ''
                 },
@@ -374,6 +445,18 @@ export default {
                     result: ''
                 }
             },
+            dao: {
+                address: this.$store.state.contracts.dao.address,
+                contract: null,
+                getReward: {
+                    address: '',
+                    result: ''
+                },
+                predReward: {
+                    address: '',
+                    result: ''
+                }
+            },
         }
       }
   },
@@ -410,6 +493,10 @@ export default {
             this.$store.state.contracts.invitation.address,
             this.$store.state.contracts.invitation.abi,
             this.provider.getSigner())
+        this.contracts.dao.contract = new ethers.Contract(
+            this.$store.state.contracts.dao.address,
+            this.$store.state.contracts.dao.abi,
+            this.provider.getSigner())
       }
     },
     async invokeTokenalanceOf(token) {
@@ -431,6 +518,13 @@ export default {
         token.approve.approveTo, 
         token.approve.value)
       token.approve.result = tx.hash
+    },
+    async invokeTokenTransfer(token) {
+      this.checkMetaMask()
+      const tx = await token.contract.transfer(
+        token.transfer.to, 
+        token.transfer.value)
+      token.transfer.result = tx.hash
     },
     async invokeRouterAddLiquidity() {
       this.checkMetaMask()
@@ -479,6 +573,33 @@ export default {
           this.contracts.invitation.getMembers.address
       )
       this.contracts.invitation.getMembers.result = members
+    },
+    async getReward() {
+      this.checkMetaMask()
+      if (this.contracts.dao.getReward.address == '') {
+          this.contracts.dao.getReward.result = 'Empty address'
+          return
+      }
+      const tx = await this.contracts.dao.contract.getReward(
+          this.contracts.dao.getReward.address
+      )
+      this.contracts.dao.getReward.result = tx.hash
+    },
+    async predReward() {
+      this.checkMetaMask()
+      if (this.contracts.dao.predReward.address == '') {
+          this.contracts.dao.predReward.result = 'Empty address'
+          return
+      }
+      try {
+        const value = await this.contracts.dao.contract.predReward(
+          this.contracts.dao.predReward.address
+        )
+        this.contracts.dao.predReward.result = value
+      } catch (err) {
+        console.log(err)
+        this.contracts.dao.predReward.result = 'No Liquidity'
+      }
     }
   },
 }
