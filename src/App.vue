@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { BigNumber, ethers } from "ethers";
+import { ethers } from "ethers";
 
 export default {
   name: 'App',
@@ -40,7 +40,7 @@ export default {
   data: () => ({
     isConnected: false,
     currentAccount: '',
-    currentBalance: 0,
+    currentBalance: '0',
     provider: null,
     accounts: []
   }),
@@ -88,7 +88,7 @@ export default {
         this.$store.commit('updateAccount', this.accounts)
         this.provider = new ethers.providers.Web3Provider(window.ethereum)
         let balance = await this.provider.getBalance(this.accounts[0])
-        this.currentBalance = balance.div(BigNumber.from('100000000000')).toNumber() / 1000000
+        this.currentBalance = ethers.utils.formatEther(balance)
         this.isConnected = true
       }
     }
