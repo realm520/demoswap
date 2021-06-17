@@ -9,7 +9,7 @@ Vue.use(Vuex)
 // var jsonFile = "pathToYourJSONFile/project.json";
 // var parsed= JSON.parse(fs.readFileSync(jsonFile));
 // var abi = parsed.abi;
-var erc20 = require('../contracts/ERC20.json');
+var erc20Permit = require('../contracts/ERC20PermitMock.json');
 var pair = require('../contracts/DaoswapPair.json');
 var router = require('../contracts/DaoswapRouter.json');
 var dspToken = require('../contracts/DSPToken.json');
@@ -19,15 +19,8 @@ const state = {
   accounts: [],
   contracts: {
       tokenA: {
-        address: '0x22d9a135818e0bF814D3b05B2064C7921AA4fb6f',
-        abi: erc20.abi
-      },
-      tokenB: {
-        address: '0xB1C40D243BE13D9912c641D890E72C856232fB18',
-        abi: erc20.abi
-      },
-      weth: {
-        address: '0xb54A5d7C3d175D08F28f98F01fC25E9c2991fC3A'
+        address: '0x60cA78e78F4e1346314f8695bD6840d317c6E1D0',
+        abi: erc20Permit.abi,
       },
       router: {
         address: '0x528775eEc8Aa6C6C759c8a2482420D1609a4BEDC',
