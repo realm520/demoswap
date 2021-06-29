@@ -35,13 +35,14 @@
 </template>
 <script>
 import { ethers } from "ethers";
+import { signERC2612Permit } from "eth-permit";
 // import { exception } from 'console';
 
 export default {
   name: "PoolPanel",
   data() {
     return {
-      fromAddr: "0x5Da9aF329740c4c155e05932749fCBa44Cf09c79",
+      fromAddr: "",
       isShowPoolBtn: true,
       provider: null,
       currentContractAddress: "",
@@ -129,6 +130,7 @@ export default {
             abi: this.$store.state.contracts[c].abi,
           };
         }
+        this.fromAddr = this.$store.state.accounts[0];
       }
     },
     async invokeContract() {
@@ -156,10 +158,7 @@ export default {
         this.contractResult = ethers.utils.formatEther(balance).toString();
         console.log(balance.toString());
       } else if (this.currentFunction == "approve") {
-        const tx = await contract.approve(
-          this.currentParams[0],
-          this.currentParams[1]
-        );
+        const tx = await contract.approve(this.currentParams[0], this.currentParams[1]);
         this.contractResult = tx.hash;
         console.log(tx.hash.toString());
       } else if (this.currentFunction == "allowance") {
@@ -169,42 +168,100 @@ export default {
         );
         this.contractResult = ethers.utils.formatEther(allowance).toString();
         console.log(ethers.utils.formatEther(allowance).toString());
+      } else if (this.currentFunction == "permit") {
+        // const chainId = 123;
+        // const msgParams = {
+        //   domain: {
+        //     chainId: chainId.toString(),
+        //     name: "Ether Mail",
+        //     verifyingContract: this.currentContractAddress,
+        //     version: "1",
+        //   },
+        //   message: {
+        //     contents: "Hello, Bob!",
+        //     from: {
+        //       name: "Cow",
+        //       wallets: [
+        //         "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
+        //         "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF",
+        //       ],
+        //     },
+        //     to: [
+        //       {
+        //         name: "Bob",
+        //         wallets: [
+        //           "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+        //           "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
+        //           "0xB0B0b0b0b0b0B000000000000000000000000000",
+        //         ],
+        //       },
+        //     ],
+        //   },
+        //   primaryType: "Mail",
+        //   types: {
+        //     EIP712Domain: [
+        //       { name: "name", type: "string" },
+        //       { name: "version", type: "string" },
+        //       { name: "chainId", type: "uint256" },
+        //       { name: "verifyingContract", type: "address" },
+        //     ],
+        //     Group: [
+        //       { name: "name", type: "string" },
+        //       { name: "members", type: "Person[]" },
+        //     ],
+        //     Mail: [
+        //       { name: "from", type: "Person" },
+        //       { name: "to", type: "Person[]" },
+        //       { name: "contents", type: "string" },
+        //     ],
+        //     Person: [
+        //       { name: "name", type: "string" },
+        //       { name: "wallets", type: "address[]" },
+        //     ],
+        //   },
+        // };
+        // try {
+        //   const from = accounts[0];
+        //   const sign = await ethereum.request({
+        //     method: "eth_signTypedData_v4",
+        //     params: [from, JSON.stringify(msgParams)],
+        //   });
+        //   signTypedDataV4Result.innerHTML = sign;
+        //   signTypedDataV4Verify.disabled = false;
+        //   console.log("r: " + sign.slice(0, 66));
+        //   console.log("s: 0x" + sign.slice(66, 130));
+        //   console.log("v: " + parseInt(sign.slice(130, 132), 16));
+        // } catch (err) {
+        //   console.error(err);
+        //   signTypedDataV4Result.innerHTML = `Error: ${err.message}`;
+        // }
+        console.log(this.fromAddr);
+        const result = await signERC2612Permit(
+          window.ethereum,
+          this.currentContractAddress,
+          this.fromAddr,
+          this.currentParams[1],
+          this.currentParams[2]
+        );
+        console.log(result);
+        await contract
+          .permit(
+            this.fromAddr,
+            this.currentParams[1],
+            this.currentParams[2],
+            result.deadline,
+            result.v,
+            result.r,
+            result.s
+          );
+        const allowance = await contract.allowance(
+          this.currentParams[0],
+          this.currentParams[1]
+        );
+        this.contractResult = ethers.utils.formatEther(allowance).toString();
+        console.log(ethers.utils.formatEther(allowance).toString());
       }
     },
-    // async invokeTokenTransfer(token) {
-    //   this.checkMetaMask();
-    //   const tx = await token.contract.transfer(token.transfer.to, token.transfer.value);
-    //   token.transfer.result = tx.hash;
-    // },
-    // async invokeRouterAddLiquidity() {
-    //   this.checkMetaMask();
-    //   const tx = await this.contracts.tokenA.contract.approve(
-    //     this.contracts.router.addLiquidity.tokenA,
-    //     this.contracts.router.addLiquidity.tokenB
-    //   );
-    //   this.contracts.tokenA.approve.result = tx.hash;
-    // },
-    // async invokePairABToken0() {
-    //   this.checkMetaMask();
-    //   const token0 = await this.contracts.pairAB.contract.token0();
-    //   this.contracts.pairAB.token0.result = token0;
-    // },
-    // async invokePairABToken1() {
-    //   this.checkMetaMask();
-    //   const token1 = await this.contracts.pairAB.contract.token1();
-    //   this.contracts.pairAB.token1.result = token1;
-    // },
-    // async addInvitationRelation() {
-    //   this.checkMetaMask()
-    //   try {
-    //     const tx = await this.contracts.invitation.contract.add_invitation_relation(
-    //         this.contracts.invitation.addInvitationRelation.inviter
-    //     )
-    //     this.contracts.invitation.addInvitationRelation.result = tx.hash
-    //   } catch (err) {
-    //       console.log(err.data.message)
-    //   }
-    // },
     async getDelegate() {
       this.checkMetaMask();
       if (this.contracts.invitation.getDelegate.address == "") {
