@@ -161,6 +161,10 @@ export default {
         const tx = await contract.approve(this.currentParams[0], this.currentParams[1]);
         this.contractResult = tx.hash;
         console.log(tx.hash.toString());
+      } else if (this.currentFunction == "nonces") {
+        let nonces = await contract.nonces(this.currentParams[0]);
+        this.contractResult = ethers.utils.formatEther(nonces).toString();
+        console.log(nonces.toString());
       } else if (this.currentFunction == "allowance") {
         const allowance = await contract.allowance(
           this.currentParams[0],
@@ -169,73 +173,6 @@ export default {
         this.contractResult = ethers.utils.formatEther(allowance).toString();
         console.log(ethers.utils.formatEther(allowance).toString());
       } else if (this.currentFunction == "permit") {
-        // const chainId = 123;
-        // const msgParams = {
-        //   domain: {
-        //     chainId: chainId.toString(),
-        //     name: "Ether Mail",
-        //     verifyingContract: this.currentContractAddress,
-        //     version: "1",
-        //   },
-        //   message: {
-        //     contents: "Hello, Bob!",
-        //     from: {
-        //       name: "Cow",
-        //       wallets: [
-        //         "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826",
-        //         "0xDeaDbeefdEAdbeefdEadbEEFdeadbeEFdEaDbeeF",
-        //       ],
-        //     },
-        //     to: [
-        //       {
-        //         name: "Bob",
-        //         wallets: [
-        //           "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-        //           "0xB0BdaBea57B0BDABeA57b0bdABEA57b0BDabEa57",
-        //           "0xB0B0b0b0b0b0B000000000000000000000000000",
-        //         ],
-        //       },
-        //     ],
-        //   },
-        //   primaryType: "Mail",
-        //   types: {
-        //     EIP712Domain: [
-        //       { name: "name", type: "string" },
-        //       { name: "version", type: "string" },
-        //       { name: "chainId", type: "uint256" },
-        //       { name: "verifyingContract", type: "address" },
-        //     ],
-        //     Group: [
-        //       { name: "name", type: "string" },
-        //       { name: "members", type: "Person[]" },
-        //     ],
-        //     Mail: [
-        //       { name: "from", type: "Person" },
-        //       { name: "to", type: "Person[]" },
-        //       { name: "contents", type: "string" },
-        //     ],
-        //     Person: [
-        //       { name: "name", type: "string" },
-        //       { name: "wallets", type: "address[]" },
-        //     ],
-        //   },
-        // };
-        // try {
-        //   const from = accounts[0];
-        //   const sign = await ethereum.request({
-        //     method: "eth_signTypedData_v4",
-        //     params: [from, JSON.stringify(msgParams)],
-        //   });
-        //   signTypedDataV4Result.innerHTML = sign;
-        //   signTypedDataV4Verify.disabled = false;
-        //   console.log("r: " + sign.slice(0, 66));
-        //   console.log("s: 0x" + sign.slice(66, 130));
-        //   console.log("v: " + parseInt(sign.slice(130, 132), 16));
-        // } catch (err) {
-        //   console.error(err);
-        //   signTypedDataV4Result.innerHTML = `Error: ${err.message}`;
-        // }
-        console.log(this.fromAddr);
         const result = await signERC2612Permit(
           window.ethereum,
           this.currentContractAddress,
@@ -243,7 +180,6 @@ export default {
           this.currentParams[1],
           this.currentParams[2]
         );
-        console.log(result);
         await contract
           .permit(
             this.fromAddr,
